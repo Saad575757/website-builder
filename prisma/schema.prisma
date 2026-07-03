@@ -1,0 +1,278 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ProjectStatus {
+  DRAFT
+  GENERATING
+  COMPLETED
+  PUBLISHED
+}
+
+enum SubscriptionPlan {
+  FREE
+  STARTER
+  PRO
+  AGENCY
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  EXPIRED
+}
+
+enum PageStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model User {
+  id            String         @id @default(cuid())
+  name          String?
+  email         String         @unique
+  imageUrl      String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  projects      Project[]
+  subscription  Subscription?
+  admin         Admin?
+}
+
+model Project {
+  id            String        @id @default(cuid())
+  userId        String
+  name          String
+  category      String?
+  description   String?
+  logoUrl       String?
+  status        ProjectStatus @default(DRAFT)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  theme         Theme?
+  pages         Page[]
+  domains       Domain[]
+  leads         Lead[]
+  analytics     Analytics[]
+  blogs         Blog[]
+  subscribers   Subscriber[]
+  appointments  Appointment[]
+
+  @@index([userId])
+}
+
+model Theme {
+  id            String   @id @default(cuid())
+  projectId     String   @unique
+  brandStyle    String?
+  primaryColor  String   @default("#6366f1")
+  secondaryColor String @default("#8b5cf6")
+  accentColor   String   @default("#06b6d4")
+  fontHeading   String   @default("Inter")
+  fontBody      String   @default("Inter")
+  borderRadius  String   @default("0.5rem")
+  shadow        String   @default("md")
+  spacing       String   @default("1rem")
+  brandingNotes String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Page {
+  id            String     @id @default(cuid())
+  projectId     String
+  title         String
+  slug          String
+  status        PageStatus @default(DRAFT)
+  sortOrder     Int        @default(0)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  project       Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  sections      Section[]
+  seo           PageSEO?
+
+  @@unique([projectId, slug])
+  @@index([projectId])
+}
+
+model Section {
+  id          String   @id @default(cuid())
+  pageId      String
+  type        String
+  contentJson Json     @default("{}")
+  stylesJson  Json     @default("{}")
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  page        Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@index([pageId])
+}
+
+model PageSEO {
+  id            String   @id @default(cuid())
+  pageId        String   @unique
+  metaTitle     String?
+  metaDescription String?
+  keywords      String?
+  ogImage       String?
+  ogTitle       String?
+  ogDescription String?
+  structuredData Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  page          Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+}
+
+model Domain {
+  id        String   @id @default(cuid())
+  projectId String
+  domain    String
+  verified  Boolean  @default(false)
+  ssl       Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([domain])
+  @@index([projectId])
+}
+
+model Lead {
+  id        String   @id @default(cuid())
+  projectId String
+  name      String
+  email     String
+  phone     String?
+  message   String?
+  source    String?
+  createdAt DateTime @default(now())
+
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+model Subscriber {
+  id        String   @id @default(cuid())
+  projectId String
+  email     String   @unique
+  createdAt DateTime @default(now())
+
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+model Appointment {
+  id          String   @id @default(cuid())
+  projectId   String
+  name        String
+  email       String
+  phone       String?
+  date        DateTime?
+  message     String?
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
+
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+model Subscription {
+  id              String             @id @default(cuid())
+  userId          String             @unique
+  plan            SubscriptionPlan   @default(FREE)
+  status          SubscriptionStatus @default(ACTIVE)
+  stripeCustomerId String?
+  stripeSubscriptionId String?
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Blog {
+  id          String   @id @default(cuid())
+  projectId   String
+  title       String
+  slug        String
+  content     Json?
+  excerpt     String?
+  imageUrl    String?
+  category    String?
+  tags        String?
+  author      String?
+  published   Boolean  @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, slug])
+  @@index([projectId])
+}
+
+model Analytics {
+  id          String   @id @default(cuid())
+  projectId   String
+  date        DateTime @default(now())
+  visitors    Int      @default(0)
+  pageViews   Int      @default(0)
+  leads       Int      @default(0)
+  page        String?
+  userAgent   String?
+
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, date])
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AIModel {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  provider  String
+  tier      String   @default("standard")
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model Template {
+  id        String   @id @default(cuid())
+  name      String
+  category  String
+  thumbnail String?
+  pages     Json     @default("[]")
+  theme     Json     @default("{}")
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
