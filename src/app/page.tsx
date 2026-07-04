@@ -46,9 +46,7 @@ export default function LandingPage() {
             <Link href="#templates" className="text-sm text-muted-foreground hover:text-foreground">
               Templates
             </Link>
-            <Link href="#pricing" className="text-sm text-muted-foreground hover:text-foreground">
-              Pricing
-            </Link>
+
           </nav>
           <div className="flex items-center gap-4">
             <Link href="/sign-in">
@@ -181,63 +179,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="pricing" className="py-24">
-          <div className="container">
-            <div className="text-center">
-              <h2 className="text-3xl font-bold">Simple, Transparent Pricing</h2>
-              <p className="mt-4 text-muted-foreground">
-                Start free, upgrade as you grow
-              </p>
-            </div>
-            <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-              {plans.map((plan, i) => (
-                <motion.div
-                  key={plan.name}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                  className={plan.popular ? "relative" : ""}
-                >
-                  {plan.popular && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <Badge variant="premium">Most Popular</Badge>
-                    </div>
-                  )}
-                  <Card
-                    className={`h-full transition-all hover:shadow-lg ${
-                      plan.popular ? "border-primary shadow-md" : ""
-                    }`}
-                  >
-                    <CardContent className="p-6">
-                      <h3 className="text-xl font-bold">{plan.name}</h3>
-                      <div className="mt-4">
-                        <span className="text-4xl font-bold">${plan.price}</span>
-                        <span className="text-muted-foreground">/month</span>
-                      </div>
-                      <ul className="mt-6 space-y-3">
-                        {plan.features.map((f) => (
-                          <li key={f} className="flex items-center gap-2 text-sm">
-                            <div className="h-1.5 w-1.5 rounded-full bg-primary" />
-                            {f}
-                          </li>
-                        ))}
-                      </ul>
-                      <Link href="/sign-up">
-                        <Button
-                          className="mt-6 w-full"
-                          variant={plan.popular ? "default" : "outline"}
-                        >
-                          Get Started
-                        </Button>
-                      </Link>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
+
       </main>
 
       <footer className="border-t py-12">
@@ -287,29 +229,3 @@ const categories = [
   "Auto Workshop",
 ];
 
-const plans = [
-  {
-    name: "Free",
-    price: 0,
-    features: ["1 Website", "Platform Branding", "Basic Templates"],
-    popular: false,
-  },
-  {
-    name: "Starter",
-    price: 19,
-    features: ["3 Websites", "Custom Domain", "All Templates"],
-    popular: true,
-  },
-  {
-    name: "Pro",
-    price: 49,
-    features: ["Unlimited Websites", "AI Content", "AI Images"],
-    popular: false,
-  },
-  {
-    name: "Agency",
-    price: 99,
-    features: ["Unlimited", "White Label", "Team Access"],
-    popular: false,
-  },
-];

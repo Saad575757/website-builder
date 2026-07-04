@@ -60,12 +60,6 @@ export const templates: TemplateDefinition[] = [
             sortOrder: 4,
           },
           {
-            type: "pricing",
-            content: { title: "Pricing Plans" },
-            styles: {},
-            sortOrder: 5,
-          },
-          {
             type: "faq",
             content: { title: "FAQs" },
             styles: {},
@@ -218,7 +212,6 @@ export const templates: TemplateDefinition[] = [
           { type: "services", content: { title: "Classes & Programs" }, styles: {}, sortOrder: 2 },
           { type: "team", content: { title: "Our Trainers" }, styles: {}, sortOrder: 3 },
           { type: "testimonials", content: { title: "Member Results" }, styles: {}, sortOrder: 4 },
-          { type: "pricing", content: { title: "Membership Plans" }, styles: {}, sortOrder: 5 },
           { type: "contact", content: { title: "Free Trial" }, styles: {}, sortOrder: 6 },
         ],
       },

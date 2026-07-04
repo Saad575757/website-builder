@@ -18,7 +18,7 @@ export default async function LeadsPage() {
   if (!userId) redirect("/sign-in");
 
   const user = await prisma.user.upsert({
-    where: { email: userId },
+    where: { id: userId },
     create: { id: userId, email: userId },
     update: {},
   });

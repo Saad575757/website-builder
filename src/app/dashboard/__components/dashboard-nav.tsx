@@ -10,7 +10,6 @@ import {
   BarChart3,
   Users,
   Globe2,
-  CreditCard,
   Settings,
   FileText,
   Sparkles as SparklesIcon,
@@ -22,8 +21,6 @@ const navItems = [
   { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/dashboard/leads", label: "Leads", icon: Users },
   { href: "/dashboard/domains", label: "Domains", icon: Globe2 },
-  { href: "/dashboard/blogs", label: "Blogs", icon: FileText },
-  { href: "/dashboard/billing", label: "Billing", icon: CreditCard },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 

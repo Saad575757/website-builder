@@ -145,6 +145,7 @@ export function BuilderClient({ project }: BuilderClientProps) {
     previewMode === "mobile" ? "w-[375px]" : previewMode === "tablet" ? "w-[768px]" : "w-full";
 
   return (
+    <Tabs value={activeTab} onValueChange={setActiveTab}>
     <div className="flex h-screen flex-col">
       <header className="flex items-center justify-between border-b bg-card px-4 py-3">
         <div className="flex items-center gap-4">
@@ -158,14 +159,12 @@ export function BuilderClient({ project }: BuilderClientProps) {
             <p className="text-xs text-muted-foreground">Builder</p>
           </div>
           <Separator orientation="vertical" className="h-8" />
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList>
+          <TabsList>
               <TabsTrigger value="editor">Editor</TabsTrigger>
               <TabsTrigger value="pages">Pages</TabsTrigger>
               <TabsTrigger value="theme">Theme</TabsTrigger>
               <TabsTrigger value="seo">SEO</TabsTrigger>
             </TabsList>
-          </Tabs>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1 rounded-lg border p-1">
@@ -332,5 +331,6 @@ export function BuilderClient({ project }: BuilderClientProps) {
         </main>
       </div>
     </div>
+    </Tabs>
   );
 }

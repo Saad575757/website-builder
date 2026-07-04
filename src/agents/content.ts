@@ -20,7 +20,6 @@ Services: title, items[] with { title, description, icon }
 Features: title, items[] with { title, description, icon }
 Team: title, members[] with { name, role, bio, image }
 Testimonials: title, items[] with { name, role, content, rating }
-Pricing: title, plans[] with { name, price, features[], cta }
 FAQ: title, items[] with { question, answer }
 Contact: title, email, phone, address, formFields[]
 Menu (restaurant): title, categories[] with { name, items[] }

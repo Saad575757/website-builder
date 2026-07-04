@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { analyzeBranding } from "@/agents/branding";
 import { generateLayout } from "@/agents/layout";
@@ -9,6 +9,7 @@ import { generateSEO } from "@/agents/seo";
 import { buildWebsite } from "@/agents/builder";
 import { slugify } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
+import { sendEmail, renderBusinessSubmissionEmail } from "@/lib/email";
 
 export async function createProject(formData: FormData) {
   const { userId } = await auth();
@@ -22,15 +23,26 @@ export async function createProject(formData: FormData) {
   const country = formData.get("country") as string;
   const phone = formData.get("phone") as string;
   const email = formData.get("email") as string;
+  const address = formData.get("address") as string;
+  const logoFile = formData.get("logo") as File | null;
+  const logoBuffer = logoFile ? Buffer.from(await logoFile.arrayBuffer()) : null;
+  const ipAddress = formData.get("ipAddress") as string | null;
+  const userAgent = formData.get("userAgent") as string | null;
 
   if (!companyName || !description) {
     return { error: "Company name and description are required" };
   }
 
+  const clerkUser = await currentUser();
+  const realName = clerkUser
+    ? [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(" ") || clerkUser.emailAddresses[0]?.emailAddress || userId
+    : userId;
+  const realEmail = clerkUser?.emailAddresses[0]?.emailAddress || userId;
+
   const user = await prisma.user.upsert({
-    where: { email: userId },
-    create: { id: userId, email: userId, name: companyName },
-    update: {},
+    where: { id: userId },
+    create: { id: userId, email: realEmail, name: realName },
+    update: { email: realEmail, name: realName },
   });
 
   const project = await prisma.project.create({
@@ -42,6 +54,39 @@ export async function createProject(formData: FormData) {
       status: "GENERATING",
     },
   });
+
+  const { html, text } = renderBusinessSubmissionEmail({
+    userName: realName,
+    userEmail: realEmail,
+    userId: user.id,
+    companyName,
+    category: category || "General",
+    tagline: tagline || undefined,
+    description,
+    phone: phone || undefined,
+    businessEmail: email || undefined,
+    address: address || undefined,
+    city: city || undefined,
+    country: country || undefined,
+    logoUploaded: !!logoFile,
+    logoFileName: logoFile?.name || undefined,
+    logoUrl: undefined,
+    aiEnabled: true,
+    submissionTime: new Date().toLocaleString(),
+    ipAddress: ipAddress || undefined,
+    userAgent: userAgent || undefined,
+  });
+
+  const attachments = logoBuffer && logoFile
+    ? [{ filename: logoFile.name, content: logoBuffer }]
+    : undefined;
+
+  await sendEmail(
+    `🚀 New AI Website Builder Submission - ${companyName}`,
+    html,
+    text,
+    attachments
+  );
 
   try {
     const logoAnalysis = await analyzeBranding(
@@ -104,7 +149,7 @@ export async function createProject(formData: FormData) {
       data: { status: "DRAFT" },
     });
     console.error("AI generation failed:", error);
-    return { error: "AI generation failed. Please try again." };
+    return { error: "insufficient_credits" };
   }
 }
 

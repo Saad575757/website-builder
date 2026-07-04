@@ -3,8 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users, Globe, CreditCard, Activity, TrendingUp } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
+import { Users, Globe, Activity } from "lucide-react";
 
 export default async function AdminPage() {
   const { userId } = await auth();
@@ -18,20 +17,12 @@ export default async function AdminPage() {
   const publishedProjects = await prisma.project.count({
     where: { status: "PUBLISHED" },
   });
-  const totalSubscriptions = await prisma.subscription.count({
-    where: { status: "ACTIVE" },
-  });
   const totalLeads = await prisma.lead.count();
-  const paidSubscriptions = await prisma.subscription.count({
-    where: { plan: { not: "FREE" }, status: "ACTIVE" },
-  });
 
   const stats = [
     { label: "Total Users", value: totalUsers, icon: Users, color: "text-blue-500" },
     { label: "Total Websites", value: totalProjects, icon: Globe, color: "text-violet-500" },
     { label: "Published", value: publishedProjects, icon: Globe, color: "text-emerald-500" },
-    { label: "Active Subscriptions", value: totalSubscriptions, icon: CreditCard, color: "text-amber-500" },
-    { label: "Paid Subscriptions", value: paidSubscriptions, icon: TrendingUp, color: "text-rose-500" },
     { label: "Total Leads", value: totalLeads, icon: Activity, color: "text-cyan-500" },
   ];
 

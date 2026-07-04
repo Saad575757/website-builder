@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight, Building2, Upload, Sparkles } from "lucide-react";
 import { createProject } from "@/actions/project";
+import { trackOnboardingStep } from "@/actions/notifications";
 import Image from "next/image";
 
 const steps = [
@@ -65,6 +66,26 @@ export default function OnboardingPage() {
     }
   };
 
+  const handleNext = async (nextStep: number) => {
+    const step = nextStep - 1;
+    trackOnboardingStep({
+      step,
+      companyName: formData.companyName || undefined,
+      tagline: formData.tagline || undefined,
+      description: formData.description || undefined,
+      phone: formData.phone || undefined,
+      email: formData.email || undefined,
+      address: formData.address || undefined,
+      city: formData.city || undefined,
+      country: formData.country || undefined,
+      category: formData.category || undefined,
+      logoUploaded: !!formData.logoFile,
+      logoFileName: formData.logoFile?.name || undefined,
+      userAgent: navigator.userAgent,
+    });
+    setStep(nextStep);
+  };
+
   const handleGenerate = async () => {
     if (!user) return;
     setGenerating(true);
@@ -82,8 +103,32 @@ export default function OnboardingPage() {
       if (formData.logoFile) {
         form.append("logo", formData.logoFile);
       }
+      form.append("userAgent", navigator.userAgent);
 
       const result = await createProject(form);
+      if ("error" in result && result.error === "insufficient_credits") {
+        toast.custom(() => (
+          <div className="w-80 rounded-xl border bg-card p-4 shadow-lg">
+            <div className="mb-2 flex items-center gap-2 text-destructive">
+              <Sparkles className="h-5 w-5" />
+              <h3 className="font-semibold">AI Website Generation Failed</h3>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              We&apos;re sorry, but we couldn&apos;t generate your website because there are
+              insufficient AI credits available.
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+              One of our support specialists will contact you shortly to assist you
+              and ensure your website is created as quickly as possible.
+            </p>
+            <p className="mt-2 text-sm font-medium text-muted-foreground">
+              Thank you for your patience.
+            </p>
+          </div>
+        ));
+        router.push("/dashboard");
+        return;
+      }
       if ("error" in result && result.error) {
         toast.error(result.error);
         return;
@@ -363,7 +408,7 @@ export default function OnboardingPage() {
               </Button>
               {step < steps.length - 1 ? (
                 <Button
-                  onClick={() => setStep((s) => Math.min(steps.length - 1, s + 1))}
+                  onClick={() => handleNext(Math.min(steps.length - 1, step + 1))}
                   disabled={
                     (step === 0 && !formData.companyName) ||
                     (step === 1 && !formData.category)

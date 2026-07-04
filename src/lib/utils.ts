@@ -73,63 +73,6 @@ export const businessCategories = [
 
 export type BusinessCategory = (typeof businessCategories)[number];
 
-export const subscriptionPlans = [
-  {
-    id: "free",
-    name: "Free",
-    price: 0,
-    websites: 1,
-    features: [
-      "1 Website",
-      "Platform Branding",
-      "Basic Templates",
-      "Free Subdomain",
-    ],
-  },
-  {
-    id: "starter",
-    name: "Starter",
-    price: 19,
-    websites: 3,
-    features: [
-      "3 Websites",
-      "Custom Domain",
-      "All Templates",
-      "Remove Branding",
-      "Basic Analytics",
-    ],
-  },
-  {
-    id: "pro",
-    name: "Pro",
-    price: 49,
-    websites: -1,
-    features: [
-      "Unlimited Websites",
-      "Custom Domain",
-      "AI Content Generation",
-      "AI Image Generation",
-      "Advanced Analytics",
-      "Priority Support",
-    ],
-  },
-  {
-    id: "agency",
-    name: "Agency",
-    price: 99,
-    websites: -1,
-    features: [
-      "Unlimited Websites",
-      "Custom Domain",
-      "Team Members",
-      "White Label",
-      "AI Everything",
-      "API Access",
-      "Dedicated Support",
-    ],
-  },
-] as const;
-
 export const sectionDefinitions = [
   { type: "hero", label: "Hero", icon: "layout", category: "header" },
   { type: "about", label: "About", icon: "info", category: "content" },
@@ -138,7 +81,7 @@ export const sectionDefinitions = [
   { type: "portfolio", label: "Portfolio", icon: "image", category: "content" },
   { type: "team", label: "Team", icon: "users", category: "content" },
   { type: "testimonials", label: "Testimonials", icon: "message-square", category: "social" },
-  { type: "pricing", label: "Pricing", icon: "dollar-sign", category: "conversion" },
+
   { type: "faq", label: "FAQ", icon: "help-circle", category: "content" },
   { type: "contact", label: "Contact", icon: "phone", category: "footer" },
   { type: "cta", label: "Call to Action", icon: "target", category: "conversion" },
