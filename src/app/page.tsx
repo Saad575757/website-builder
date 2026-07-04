@@ -184,7 +184,7 @@ export default function LandingPage() {
 
       <footer className="border-t py-12">
         <div className="container text-center text-sm text-muted-foreground">
-          <p>&copy; 2024 WebForge. All rights reserved.</p>
+          <p>&copy; 2026 WebForge. All rights reserved.</p>
         </div>
       </footer>
     </div>
